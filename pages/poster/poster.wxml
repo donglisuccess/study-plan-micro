@@ -1,0 +1,63 @@
+<view class="page poster-page" wx:if="{{plan}}">
+  <view class="poster-note">适合转发给家人，一起看看暑假安排</view>
+
+  <view class="poster-preview">
+    <view class="poster-head">
+      <view class="poster-bg poster-bg-a"></view>
+      <view class="poster-bg poster-bg-b"></view>
+      <view class="poster-brand">暑假学习计划助手</view>
+      <view class="poster-title">我的暑假学习计划</view>
+      <view class="poster-subtitle">{{plan.grade}}{{plan.subject}} · {{plan.days}} 天{{plan.goal}}计划</view>
+    </view>
+
+    <view class="poster-body">
+      <view class="poster-grid">
+        <view class="poster-info-card">
+          <view class="poster-icon target-icon"></view>
+          <view class="poster-label">学习目标</view>
+          <view class="poster-value">{{plan.goal}}</view>
+        </view>
+        <view class="poster-info-card">
+          <view class="poster-icon clock-icon"></view>
+          <view class="poster-label">每天时长</view>
+          <view class="poster-value">{{plan.dailyTime}}</view>
+        </view>
+        <view class="poster-info-card">
+          <view class="poster-icon calendar-icon"></view>
+          <view class="poster-label">计划周期</view>
+          <view class="poster-value">{{plan.days}} 天</view>
+        </view>
+        <view class="poster-info-card">
+          <view class="poster-icon book-icon"></view>
+          <view class="poster-label">学习基础</view>
+          <view class="poster-value">{{plan.level}}</view>
+        </view>
+      </view>
+
+      <view class="focus-block">
+        <view class="focus-title">重点学习内容</view>
+        <view class="focus-text">{{plan.focus}}</view>
+      </view>
+
+      <view class="poster-slogan">每天坚持一点点，暑假把基础补扎实</view>
+
+      <view class="qr-row">
+        <view class="qr-placeholder">
+          <view class="qr-dot dot-a"></view>
+          <view class="qr-dot dot-b"></view>
+          <view class="qr-dot dot-c"></view>
+          <view class="qr-dot dot-d"></view>
+        </view>
+        <view class="qr-text">扫码生成你的暑假学习计划</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="fixed-actions poster-actions">
+    <button class="primary-button" bindtap="handleSave">保存到相册</button>
+    <view class="poster-action-row">
+      <button class="outline-button share-button" open-type="share" bindtap="handleShareTap">分享给朋友</button>
+      <button class="outline-button" bindtap="handleBack">返回计划详情</button>
+    </view>
+  </view>
+</view>

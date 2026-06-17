@@ -1,0 +1,102 @@
+<view class="page plan-page" wx:if="{{plan}}">
+  <view class="summary-card">
+    <view class="summary-bg summary-bg-a"></view>
+    <view class="summary-bg summary-bg-b"></view>
+    <view class="summary-kicker">你的专属计划</view>
+    <view class="summary-title">{{plan.grade}} · {{plan.subject}}</view>
+    <view class="summary-grid">
+      <view class="summary-item">
+        <view class="summary-label">学习目标</view>
+        <view class="summary-value">{{plan.goal}}</view>
+      </view>
+      <view class="summary-item">
+        <view class="summary-label">计划周期</view>
+        <view class="summary-value">{{plan.days}} 天</view>
+      </view>
+      <view class="summary-item">
+        <view class="summary-label">每日时长</view>
+        <view class="summary-value">{{plan.dailyTime}}</view>
+      </view>
+      <view class="summary-item">
+        <view class="summary-label">当前基础</view>
+        <view class="summary-value">{{plan.level}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="explain-card">
+    <view class="explain-icon">!</view>
+    <view class="explain-text">{{plan.summary}}</view>
+  </view>
+
+  <view class="list-heading">
+    <view class="section-heading">每日学习计划</view>
+    <view class="completion-pill">{{completedCount}}/{{plan.days}} 天完成</view>
+  </view>
+
+  <view class="day-list">
+    <view class="day-card" wx:for="{{plan.items}}" wx:key="day">
+      <view class="day-top">
+        <view class="day-number">{{item.day}}</view>
+        <view class="day-main">
+          <view class="day-title">第 {{item.day}} 天</view>
+          <view class="day-theme">{{item.title}}</view>
+        </view>
+        <view
+          class="check-circle {{item.completed ? 'is-checked' : ''}}"
+          data-index="{{index}}"
+          bindtap="toggleComplete"
+        >{{item.completed ? '✓' : ''}}</view>
+      </view>
+
+      <view class="task-list">
+        <view
+          class="task-row"
+          wx:for="{{item.tasks}}"
+          wx:for-item="task"
+          wx:for-index="taskIndex"
+          wx:key="*this"
+        >
+          <view class="task-dot"></view>
+          <view class="task-text">{{task}}</view>
+        </view>
+      </view>
+
+      <view class="day-meta">
+        <view>建议时长：{{item.duration}}</view>
+      </view>
+      <view class="day-tip">今日提醒：{{item.tip}}</view>
+    </view>
+  </view>
+
+  <view class="fixed-actions plan-actions">
+    <button class="primary-button poster-button" bindtap="handlePoster">生成分享海报</button>
+    <view class="secondary-actions">
+      <button class="outline-button secondary-button" bindtap="handleRegenerate">重新生成</button>
+      <button class="outline-button secondary-button is-warm" bindtap="openFeedback">这个计划有用吗？</button>
+    </view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showFeedback}}" catchtap="closeFeedback">
+    <view class="feedback-modal" catchtap="noop">
+      <view class="modal-title">这个计划对你有帮助吗？</view>
+      <view class="feedback-tags">
+        <view
+          wx:for="{{feedbackOptions}}"
+          wx:key="label"
+          class="feedback-tag {{item.active ? 'is-active' : ''}}"
+          data-index="{{index}}"
+          bindtap="toggleFeedback"
+        >{{item.label}}</view>
+      </view>
+      <textarea
+        class="feedback-input"
+        placeholder="你希望计划哪里更具体？可以简单说说。"
+        value="{{feedbackText}}"
+        bindinput="handleFeedbackInput"
+        maxlength="200"
+      ></textarea>
+      <button class="primary-button submit-feedback" bindtap="submitFeedback">提交反馈</button>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,34 @@
+<view class="page generating-page">
+  <view class="loading-visual">
+    <view class="paper">
+      <view class="paper-line paper-line-long"></view>
+      <view class="paper-line paper-line-mid"></view>
+      <view class="paper-line paper-line-longer"></view>
+      <view class="paper-line paper-line-short"></view>
+      <view class="paper-ring"></view>
+    </view>
+  </view>
+
+  <view class="main-title">正在为孩子生成学习计划...</view>
+  <view class="sub-title">预计 3 秒内完成</view>
+
+  <view class="progress-track">
+    <view class="progress-fill" style="width: {{progress}}%;"></view>
+  </view>
+
+  <view class="step-card" wx:if="{{!failed}}">
+    <view
+      wx:for="{{steps}}"
+      wx:key="*this"
+      class="step-row {{index < activeIndex ? 'is-done' : index == activeIndex ? 'is-active' : ''}}"
+    >
+      <view class="step-icon">{{index < activeIndex ? '✓' : ''}}</view>
+      <view class="step-text">{{item}}</view>
+    </view>
+  </view>
+
+  <view class="fail-card" wx:if="{{failed}}">
+    <view class="fail-title">{{errorText}}</view>
+    <button class="primary-button retry-button" bindtap="handleRetry">重新生成</button>
+  </view>
+</view>
