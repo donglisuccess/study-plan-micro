@@ -1,0 +1,165 @@
+page {
+  background: #f4f8fd;
+}
+
+.loading-page {
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) 64rpx calc(52rpx + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #eef6ff 0%, #f8fbff 58%, #ffffff 100%);
+}
+
+.loading-decoration {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(47, 128, 237, 0.08);
+}
+
+.decoration-top {
+  width: 360rpx;
+  height: 360rpx;
+  right: -150rpx;
+  top: -110rpx;
+}
+
+.decoration-bottom {
+  width: 250rpx;
+  height: 250rpx;
+  left: -130rpx;
+  bottom: 110rpx;
+}
+
+.loading-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateY(-36rpx);
+}
+
+.brand-mark {
+  position: relative;
+  width: 228rpx;
+  height: 190rpx;
+  margin-bottom: 44rpx;
+  filter: drop-shadow(0 24rpx 30rpx rgba(47, 128, 237, 0.18));
+}
+
+.book-page {
+  position: absolute;
+  bottom: 0;
+  width: 112rpx;
+  height: 138rpx;
+  padding-top: 52rpx;
+  background: #ffffff;
+  border: 5rpx solid #2f80ed;
+}
+
+.book-page-left {
+  left: 4rpx;
+  border-radius: 22rpx 8rpx 12rpx 26rpx;
+  transform: skewY(5deg);
+}
+
+.book-page-right {
+  right: 4rpx;
+  border-radius: 8rpx 22rpx 26rpx 12rpx;
+  transform: skewY(-5deg);
+}
+
+.book-line {
+  width: 58rpx;
+  height: 7rpx;
+  margin: 0 auto 18rpx;
+  border-radius: 99rpx;
+  background: #bcd8f7;
+}
+
+.book-line.is-short {
+  width: 42rpx;
+}
+
+.sun-mark {
+  position: absolute;
+  left: 82rpx;
+  top: 0;
+  width: 68rpx;
+  height: 68rpx;
+  border-radius: 50%;
+  border: 7rpx solid #ffb84d;
+  background: #fff4d8;
+  animation: sun-breathe 1.4s ease-in-out infinite;
+}
+
+.sun-core {
+  position: absolute;
+  left: 17rpx;
+  top: 17rpx;
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: 50%;
+  background: #ff9b3d;
+}
+
+.brand-name {
+  color: #071832;
+  font-size: 46rpx;
+  line-height: 1.3;
+  font-weight: 900;
+}
+
+.brand-slogan {
+  margin-top: 18rpx;
+  color: #708199;
+  font-size: 27rpx;
+}
+
+.loading-track {
+  width: 420rpx;
+  height: 12rpx;
+  margin-top: 72rpx;
+  overflow: hidden;
+  border-radius: 99rpx;
+  background: #dce9f7;
+}
+
+.loading-progress {
+  height: 100%;
+  border-radius: 99rpx;
+  background: linear-gradient(90deg, #2f80ed 0%, #43b98b 72%, #ffb84d 100%);
+  transition: width 0.28s ease;
+}
+
+.loading-status {
+  margin-top: 22rpx;
+  color: #60748e;
+  font-size: 25rpx;
+}
+
+.loading-footer {
+  position: absolute;
+  left: 40rpx;
+  right: 40rpx;
+  bottom: calc(46rpx + env(safe-area-inset-bottom));
+  color: #95a4b8;
+  font-size: 23rpx;
+  text-align: center;
+}
+
+@keyframes sun-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.08);
+  }
+}

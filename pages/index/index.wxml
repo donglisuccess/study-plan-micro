@@ -1,35 +1,38 @@
 <view class="page index-page">
-  <view class="hero">
-    <view class="hero-bg hero-bg-large"></view>
-    <view class="hero-bg hero-bg-small"></view>
-    <view class="hero-kicker">暑假充电，从现在开始</view>
-    <view class="hero-title">
-      <view>孩子基础差？</view>
-      <view>先生成一份补基础计划</view>
-    </view>
-    <view class="hero-desc">
-      <view>选择年级、科目和学习目标</view>
-      <view>1 分钟生成每日学习安排</view>
-    </view>
-    <view class="hero-tags">
-      <view class="hero-tag">1 分钟填写</view>
-      <view class="hero-tag">每日任务清单</view>
-      <view class="hero-tag">可保存分享</view>
-    </view>
-    <view class="hero-card-icon">
-      <view class="hero-card-line line-a"></view>
-      <view class="hero-card-line line-b"></view>
-      <view class="hero-card-line line-c"></view>
-      <view class="hero-check">✓</view>
-    </view>
-  </view>
+  <swiper
+    class="banner-swiper"
+    indicator-dots="{{true}}"
+    indicator-color="rgba(7, 24, 50, 0.22)"
+    indicator-active-color="#2f80ed"
+    autoplay="{{true}}"
+    interval="4000"
+    duration="500"
+    circular="{{true}}"
+  >
+    <swiper-item wx:for="{{bannerList}}" wx:key="url">
+      <view class="banner-slide" style="background: {{item.background}};">
+        <image class="banner-image" src="{{item.url}}" mode="aspectFill" />
+      </view>
+    </swiper-item>
+  </swiper>
 
   <view class="form-card">
     <view class="section-heading">填写孩子信息</view>
 
+    <view class="options-status" wx:if="{{isLoadingOptions}}">
+      <view class="loading-dot"></view>
+      <view>正在加载可选信息...</view>
+    </view>
+
+    <view class="options-status is-error" wx:elif="{{optionsLoadFailed}}">
+      <view>基本信息加载失败，请确认 Python 后端已启动。</view>
+      <button class="retry-options-button" bindtap="retryLoadOptions">重新加载</button>
+    </view>
+
+    <block wx:else>
     <view class="field">
       <view class="field-title">孩子年级</view>
-      <view class="option-grid">
+      <view class="option-grid option-grid-four-per-row">
         <view
           wx:for="{{gradeOptions}}"
           wx:key="*this"
@@ -43,7 +46,7 @@
 
     <view class="field">
       <view class="field-title">薄弱科目</view>
-      <view class="option-grid option-grid-three">
+      <view class="option-grid option-grid-four-per-row">
         <view
           wx:for="{{subjectOptions}}"
           wx:key="*this"
@@ -110,15 +113,21 @@
         >{{item}}</view>
       </view>
     </view>
+    </block>
   </view>
 
-  <view class="bottom-note">生成结果仅作为学习安排参考，家长可根据孩子实际情况调整。</view>
-
-  <view class="fixed-actions">
+  <view class="index-submit-area">
     <button
-      class="primary-button {{isComplete ? '' : 'is-disabled'}}"
-      disabled="{{!isComplete}}"
+      class="index-generate-button {{isComplete && !isLoadingOptions && !optionsLoadFailed ? '' : 'is-disabled'}}"
+      disabled="{{!isComplete || isLoadingOptions || optionsLoadFailed}}"
       bindtap="handleGenerate"
-    >{{isComplete ? '生成我的暑假学习计划' : '请填写完整信息'}}</button>
+    >
+      <text>{{isLoadingOptions ? '正在加载选项' : isComplete ? '生成我的暑假学习计划' : '请填写完整信息'}}</text>
+      <text class="generate-arrow" wx:if="{{isComplete && !isLoadingOptions && !optionsLoadFailed}}">→</text>
+    </button>
+    <view class="bottom-note">
+      <text class="note-icon">i</text>
+      <text>生成结果仅作为学习安排参考，家长可根据孩子实际情况调整</text>
+    </view>
   </view>
 </view>

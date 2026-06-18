@@ -206,7 +206,7 @@ Page({
 
   onShareAppMessage() {
     const plan = this.data.plan;
-    const path = plan ? '/pages/index/index?' + formatPlanQuery(plan) : '/pages/index/index';
+    const path = plan ? '/pages/loading/loading?' + formatPlanQuery(plan) : '/pages/loading/loading';
 
     return {
       title: '我生成了一份暑假学习计划，你也试试',

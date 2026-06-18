@@ -83,7 +83,7 @@ Page({
 
     return {
       title: '我生成了一份暑假学习计划，你也试试',
-      path: plan ? '/pages/index/index?' + formatPlanQuery(plan) : '/pages/index/index'
+      path: plan ? '/pages/loading/loading?' + formatPlanQuery(plan) : '/pages/loading/loading'
     };
   }
 });

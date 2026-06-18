@@ -108,7 +108,7 @@ Page({
   onShareAppMessage() {
     return {
       title: '免费生成孩子暑假学习计划',
-      path: '/pages/index/index'
+      path: '/pages/loading/loading'
     };
   }
 });

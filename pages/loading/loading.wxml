@@ -1,0 +1,30 @@
+<view class="loading-page">
+  <view class="loading-decoration decoration-top"></view>
+  <view class="loading-decoration decoration-bottom"></view>
+
+  <view class="loading-content">
+    <view class="brand-mark">
+      <view class="book-page book-page-left">
+        <view class="book-line"></view>
+        <view class="book-line is-short"></view>
+      </view>
+      <view class="book-page book-page-right">
+        <view class="book-line"></view>
+        <view class="book-line is-short"></view>
+      </view>
+      <view class="sun-mark">
+        <view class="sun-core"></view>
+      </view>
+    </view>
+
+    <view class="brand-name">暑假学习计划助手</view>
+    <view class="brand-slogan">每天进步一点点，暑假成长看得见</view>
+
+    <view class="loading-track">
+      <view class="loading-progress" style="width: {{progress}}%;"></view>
+    </view>
+    <view class="loading-status">{{statusText}}</view>
+  </view>
+
+  <view class="loading-footer">为孩子准备一份清晰、可执行的学习安排</view>
+</view>

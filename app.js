@@ -6,6 +6,9 @@ App({
   },
 
   globalData: {
-    appName: '暑假学习计划助手'
+    appName: '暑假学习计划助手',
+    apiBaseUrl: 'http://127.0.0.1:5000',
+    basicOptions: null,
+    basicOptionsError: false
   }
 });
