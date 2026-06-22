@@ -1,5 +1,7 @@
-const { generateStudyPlan } = require('../../utils/planGenerator');
+const { generateStudyPlan } = require('../../utils/api');
 const { trackEvent } = require('../../utils/eventTracker');
+
+const MIN_GENERATING_TIME = 1800;
 
 function decodeOption(value) {
   return value ? decodeURIComponent(value) : '';
@@ -11,6 +13,7 @@ Page({
     activeIndex: 0,
     failed: false,
     errorText: '',
+    mainTitle: '正在为孩子生成学习计划...',
     steps: [
       '正在分析孩子的学习基础...',
       '正在安排每日学习任务...',
@@ -30,10 +33,22 @@ Page({
       dailyTime: decodeOption(options.dailyTime)
     };
 
+    this.setData({
+      mainTitle: '正在生成' + this.formOptions.subject + '学习计划...',
+      steps: [
+        '正在分析' + this.formOptions.grade + this.formOptions.subject + '的学习基础...',
+        '正在根据“' + this.formOptions.level + '”调整任务难度...',
+        '正在围绕“' + this.formOptions.goal + '”安排学习节奏...',
+        '正在平衡复习、练习和错题整理...',
+        '正在生成' + this.formOptions.days + '的每日任务...'
+      ]
+    });
+
     this.startGenerating();
   },
 
   onUnload() {
+    this.requestSequence = (this.requestSequence || 0) + 1;
     this.clearTimers();
   },
 
@@ -50,6 +65,9 @@ Page({
 
   startGenerating() {
     this.clearTimers();
+    this.requestSequence = (this.requestSequence || 0) + 1;
+    const currentSequence = this.requestSequence;
+    const startedAt = Date.now();
 
     this.setData({
       progress: 8,
@@ -61,44 +79,69 @@ Page({
     let tick = 0;
     this.progressTimer = setInterval(() => {
       tick += 1;
-      const nextProgress = Math.min(92, 8 + tick * 17);
-      const nextIndex = Math.min(this.data.steps.length - 1, Math.floor(tick / 1.2));
+      const nextProgress = Math.min(92, 8 + tick * 13);
+      const nextIndex = Math.min(this.data.steps.length - 1, Math.floor(tick / 2));
 
       this.setData({
         progress: nextProgress,
         activeIndex: nextIndex
       });
-    }, 300);
+    }, 360);
 
-    this.finishTimer = setTimeout(() => {
-      try {
-        const plan = generateStudyPlan(this.formOptions);
-        wx.setStorageSync('latestStudyPlan', plan);
-        trackEvent('generate_success', {
-          planId: plan.id,
-          grade: plan.grade,
-          subject: plan.subject,
-          days: plan.days
-        });
+    generateStudyPlan(this.formOptions).then((plan) => {
+      if (currentSequence !== this.requestSequence) {
+        return;
+      }
 
-        this.clearTimers();
-        this.setData({
-          progress: 100,
-          activeIndex: this.data.steps.length - 1
-        });
+      const remaining = Math.max(0, MIN_GENERATING_TIME - (Date.now() - startedAt));
+      this.finishTimer = setTimeout(() => {
+        this.handleGenerateSuccess(plan, currentSequence);
+      }, remaining);
+    }).catch((error) => {
+      if (currentSequence !== this.requestSequence) {
+        return;
+      }
 
-        wx.redirectTo({
-          url: '/pages/plan/plan?id=' + encodeURIComponent(plan.id)
-        });
-      } catch (error) {
-        console.error('[study-plan] generate failed', error);
+      console.error('[study-plan] generate failed', error);
+      const remaining = Math.max(0, 900 - (Date.now() - startedAt));
+      this.finishTimer = setTimeout(() => {
+        if (currentSequence !== this.requestSequence) {
+          return;
+        }
         this.clearTimers();
         this.setData({
           failed: true,
-          errorText: '生成失败了，请稍后重试。'
+          errorText: error.message || '生成失败了，请检查网络后重试。'
         });
-      }
-    }, 1500);
+      }, remaining);
+    });
+  },
+
+  handleGenerateSuccess(plan, sequence) {
+    if (sequence !== this.requestSequence) {
+      return;
+    }
+
+    wx.setStorageSync('latestStudyPlan', plan);
+    trackEvent('generate_success', {
+      planId: plan.id,
+      grade: plan.grade,
+      subject: plan.subject,
+      days: plan.days,
+      generatedBy: plan.generatedBy || 'backend'
+    });
+
+    this.clearTimers();
+    this.setData({
+      progress: 100,
+      activeIndex: this.data.steps.length - 1
+    });
+
+    this.finishTimer = setTimeout(() => {
+      wx.redirectTo({
+        url: '/pages/plan/plan?id=' + encodeURIComponent(plan.id)
+      });
+    }, 180);
   },
 
   handleRetry() {

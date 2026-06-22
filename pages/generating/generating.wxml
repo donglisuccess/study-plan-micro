@@ -9,8 +9,8 @@
     </view>
   </view>
 
-  <view class="main-title">正在为孩子生成学习计划...</view>
-  <view class="sub-title">预计 3 秒内完成</view>
+  <view class="main-title">{{mainTitle}}</view>
+  <view class="sub-title">通常 3 秒内完成</view>
 
   <view class="progress-track">
     <view class="progress-fill" style="width: {{progress}}%;"></view>

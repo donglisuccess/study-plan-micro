@@ -9,7 +9,10 @@ function request(options) {
       url: getApiBaseUrl() + options.path,
       method: options.method || 'GET',
       data: options.data || {},
-      timeout: 8000,
+      header: {
+        'content-type': 'application/json'
+      },
+      timeout: options.timeout || 8000,
       success(response) {
         const payload = response.data || {};
         if (response.statusCode >= 200 && response.statusCode < 300 && payload.code === 0) {
@@ -19,7 +22,7 @@ function request(options) {
         reject(new Error(payload.message || '接口请求失败'));
       },
       fail(error) {
-        reject(error);
+        reject(new Error(error.errMsg || '网络连接失败'));
       }
     });
   });
@@ -31,6 +34,16 @@ function getBasicOptions() {
   });
 }
 
+function generateStudyPlan(options) {
+  return request({
+    path: '/api/study-plans/generate',
+    method: 'POST',
+    data: options,
+    timeout: 15000
+  });
+}
+
 module.exports = {
-  getBasicOptions
+  getBasicOptions,
+  generateStudyPlan
 };
