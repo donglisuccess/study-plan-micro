@@ -1,0 +1,274 @@
+.plans-page {
+  min-height: 100vh;
+  padding-bottom: calc(44rpx + env(safe-area-inset-bottom));
+  background: #f3f7fb;
+}
+
+.plans-header {
+  padding: 40rpx 30rpx 34rpx;
+  background: linear-gradient(135deg, #2f80ed 0%, #1f66bf 100%);
+  color: #ffffff;
+}
+
+.plans-title {
+  font-size: 42rpx;
+  line-height: 1.3;
+  font-weight: 900;
+}
+
+.plans-subtitle {
+  margin-top: 8rpx;
+  color: #d9eaff;
+  font-size: 25rpx;
+}
+
+.plans-stats {
+  display: flex;
+  align-items: center;
+  margin-top: 30rpx;
+  padding: 20rpx 24rpx;
+  border-radius: 14rpx;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.stat-item {
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 34rpx;
+  line-height: 1.2;
+  font-weight: 900;
+}
+
+.stat-label {
+  margin-top: 2rpx;
+  color: #d9eaff;
+  font-size: 22rpx;
+}
+
+.stat-divider {
+  width: 1rpx;
+  height: 54rpx;
+  margin: 0 30rpx;
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.subject-filters {
+  width: 100%;
+  margin-top: 24rpx;
+  white-space: nowrap;
+}
+
+.subject-filters-inner {
+  display: inline-flex;
+  gap: 14rpx;
+  padding: 0 30rpx 8rpx;
+}
+
+.subject-filter {
+  min-width: 110rpx;
+  height: 64rpx;
+  padding: 0 24rpx;
+  border: 2rpx solid #d9e3ef;
+  border-radius: 99rpx;
+  background: #ffffff;
+  color: #52657d;
+  font-size: 25rpx;
+  line-height: 60rpx;
+  text-align: center;
+}
+
+.subject-filter.is-active {
+  border-color: #2f80ed;
+  background: #eaf4ff;
+  color: #1f66bf;
+  font-weight: 800;
+}
+
+.plans-list {
+  padding: 16rpx 30rpx 0;
+}
+
+.plan-history-card {
+  margin-bottom: 20rpx;
+  padding: 26rpx 26rpx 22rpx;
+  border: 2rpx solid #dfe8f2;
+  border-radius: 16rpx;
+  background: #ffffff;
+  box-shadow: 0 8rpx 24rpx rgba(36, 64, 102, 0.05);
+}
+
+.plan-history-card.is-completed {
+  border-color: #ccebdd;
+  background: #fbfefc;
+}
+
+.history-card-top {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+}
+
+.subject-mark {
+  flex: 0 0 68rpx;
+  width: 68rpx;
+  height: 68rpx;
+  border-radius: 14rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eaf4ff;
+  color: #2f80ed;
+  font-size: 30rpx;
+  font-weight: 900;
+}
+
+.is-completed .subject-mark {
+  background: #e4f6ed;
+  color: #269d6a;
+}
+
+.history-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.history-title {
+  color: #071832;
+  font-size: 32rpx;
+  line-height: 1.3;
+  font-weight: 900;
+}
+
+.history-meta {
+  margin-top: 5rpx;
+  overflow: hidden;
+  color: #718198;
+  font-size: 23rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-arrow {
+  color: #8293a8;
+  font-size: 46rpx;
+  line-height: 1;
+}
+
+.history-progress-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24rpx;
+  color: #66788f;
+  font-size: 23rpx;
+}
+
+.history-progress-value {
+  color: #2f80ed;
+  font-weight: 800;
+}
+
+.is-completed .history-progress-value {
+  color: #269d6a;
+}
+
+.history-progress-track {
+  height: 12rpx;
+  margin-top: 12rpx;
+  overflow: hidden;
+  border-radius: 99rpx;
+  background: #e4edf7;
+}
+
+.history-progress-fill {
+  height: 100%;
+  border-radius: 99rpx;
+  background: linear-gradient(90deg, #2f80ed 0%, #37b982 100%);
+}
+
+.history-next {
+  margin-top: 18rpx;
+  padding: 14rpx 16rpx;
+  border-radius: 10rpx;
+  background: #f4f7fb;
+  color: #41546b;
+  font-size: 24rpx;
+  line-height: 1.5;
+}
+
+.history-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18rpx;
+}
+
+.history-time {
+  color: #94a2b4;
+  font-size: 21rpx;
+}
+
+.history-action {
+  color: #2f80ed;
+  font-size: 24rpx;
+  font-weight: 800;
+}
+
+.is-completed .history-action {
+  color: #269d6a;
+}
+
+.empty-plans {
+  padding: 150rpx 56rpx 60rpx;
+  text-align: center;
+}
+
+.empty-icon {
+  width: 130rpx;
+  height: 150rpx;
+  margin: 0 auto;
+  padding-top: 48rpx;
+  border: 5rpx solid #aac8e9;
+  border-radius: 18rpx;
+  background: #ffffff;
+}
+
+.empty-line {
+  width: 72rpx;
+  height: 8rpx;
+  margin: 0 auto 20rpx;
+  border-radius: 99rpx;
+  background: #c5dbf1;
+}
+
+.empty-line.is-short {
+  width: 50rpx;
+}
+
+.empty-title {
+  margin-top: 34rpx;
+  color: #071832;
+  font-size: 34rpx;
+  font-weight: 900;
+}
+
+.empty-desc {
+  margin-top: 12rpx;
+  color: #75869c;
+  font-size: 25rpx;
+  line-height: 1.6;
+}
+
+.create-plan-button {
+  width: 320rpx;
+  height: 82rpx;
+  margin: 34rpx auto 0;
+  border-radius: 16rpx;
+  background: #2f80ed;
+  color: #ffffff;
+  font-size: 28rpx;
+  line-height: 82rpx;
+  font-weight: 800;
+}

@@ -29,51 +29,129 @@
     <view class="explain-text">{{plan.summary}}</view>
   </view>
 
-  <view class="list-heading">
-    <view class="section-heading">每日学习计划</view>
-    <view class="completion-pill">{{completedCount}}/{{plan.days}} 天完成</view>
+  <view class="progress-overview {{allCompleted ? 'is-complete' : ''}}">
+    <view class="progress-heading">
+      <view>
+        <view class="progress-label">计划完成度</view>
+        <view class="progress-count">{{completedCount}} / {{plan.days}} 天</view>
+      </view>
+      <view class="progress-percent">{{progressPercent}}%</view>
+    </view>
+    <view class="plan-progress-track">
+      <view class="plan-progress-fill" style="width: {{progressPercent}}%;"></view>
+    </view>
+    <view class="next-task-text">{{nextTaskText}}</view>
   </view>
 
+  <view class="list-heading">
+    <view class="section-heading">每日学习计划</view>
+    <view class="week-hint">每周查看更清晰</view>
+  </view>
+
+  <scroll-view
+    class="week-tabs"
+    scroll-x="{{true}}"
+    show-scrollbar="{{false}}"
+    scroll-with-animation="{{true}}"
+    scroll-left="{{weekScrollLeft}}"
+  >
+    <view class="week-tabs-inner">
+      <view
+        wx:for="{{weeks}}"
+        wx:key="index"
+        class="week-tab {{selectedWeekIndex == item.index ? 'is-active' : ''}} {{item.completed ? 'is-complete' : ''}}"
+        data-index="{{item.index}}"
+        bindtap="selectWeek"
+      >
+        <view class="week-tab-title">{{item.label}}</view>
+        <view class="week-tab-meta">{{item.range}} · {{item.completedCount}}/{{item.total}}</view>
+      </view>
+    </view>
+  </scroll-view>
+
   <view class="day-list">
-    <view class="day-card" wx:for="{{plan.items}}" wx:key="day">
-      <view class="day-top">
+    <view
+      class="day-card {{item.completed ? 'is-completed' : ''}} {{expandedDay == item.day ? 'is-expanded' : ''}}"
+      wx:for="{{visibleItems}}"
+      wx:key="day"
+    >
+      <view class="day-top" data-day="{{item.day}}" bindtap="toggleDayExpand">
         <view class="day-number">{{item.day}}</view>
         <view class="day-main">
           <view class="day-title">第 {{item.day}} 天</view>
           <view class="day-theme">{{item.title}}</view>
+          <view class="day-summary">
+            <text>{{item.duration}}</text>
+            <text class="summary-separator">·</text>
+            <text>{{item.taskCount}} 项任务</text>
+          </view>
         </view>
         <view
-          class="check-circle {{item.completed ? 'is-checked' : ''}}"
-          data-index="{{index}}"
-          bindtap="toggleComplete"
-        >{{item.completed ? '✓' : ''}}</view>
-      </view>
-
-      <view class="task-list">
-        <view
-          class="task-row"
-          wx:for="{{item.tasks}}"
-          wx:for-item="task"
-          wx:for-index="taskIndex"
-          wx:key="*this"
+          class="complete-control {{item.completed ? 'is-checked' : ''}}"
+          data-index="{{item.originalIndex}}"
+          catchtap="toggleComplete"
         >
-          <view class="task-dot"></view>
-          <view class="task-text">{{task}}</view>
+          <view class="check-circle">{{item.completed ? '✓' : ''}}</view>
+          <text>{{item.completed ? '已完成' : '完成'}}</text>
         </view>
       </view>
 
-      <view class="day-meta">
-        <view>建议时长：{{item.duration}}</view>
+      <view class="day-details" wx:if="{{expandedDay == item.day}}">
+        <view class="task-list">
+          <view
+            class="task-row"
+            wx:for="{{item.tasks}}"
+            wx:for-item="task"
+            wx:for-index="taskIndex"
+            wx:key="*this"
+          >
+            <view class="task-index">{{taskIndex + 1}}</view>
+            <view class="task-text">{{task}}</view>
+          </view>
+        </view>
+
+        <view class="day-tip">
+          <view class="tip-label">今日提醒</view>
+          <view class="tip-text">{{item.tip}}</view>
+        </view>
+
+        <button
+          class="day-complete-button {{item.completed ? 'is-completed' : ''}}"
+          data-index="{{item.originalIndex}}"
+          bindtap="toggleComplete"
+        >{{item.completed ? '取消完成' : '完成今天的计划'}}</button>
       </view>
-      <view class="day-tip">今日提醒：{{item.tip}}</view>
+
+      <view
+        class="expand-handle"
+        data-day="{{item.day}}"
+        bindtap="toggleDayExpand"
+      >{{expandedDay == item.day ? '收起任务' : '查看今日任务'}}</view>
     </view>
   </view>
 
-  <view class="fixed-actions plan-actions">
-    <button class="primary-button poster-button" bindtap="handlePoster">生成分享海报</button>
-    <view class="secondary-actions">
-      <button class="outline-button secondary-button" bindtap="handleRegenerate">重新生成</button>
-      <button class="outline-button secondary-button is-warm" bindtap="openFeedback">这个计划有用吗？</button>
+  <view class="plan-action-bar">
+    <view class="plan-action-inner">
+      <button class="utility-action-button" bindtap="handleRegenerate">
+        <view class="refresh-action-icon"></view>
+        <text class="utility-action-label">重新生成</text>
+      </button>
+
+      <button class="utility-action-button" bindtap="openFeedback">
+        <view class="feedback-action-icon"></view>
+        <text class="utility-action-label">计划反馈</text>
+      </button>
+
+      <button class="poster-action-button" bindtap="handlePoster">
+        <view class="share-action-icon">
+          <view class="share-action-line share-action-line-a"></view>
+          <view class="share-action-line share-action-line-b"></view>
+          <view class="share-action-node share-action-node-a"></view>
+          <view class="share-action-node share-action-node-b"></view>
+          <view class="share-action-node share-action-node-c"></view>
+        </view>
+        <text>生成分享海报</text>
+      </button>
     </view>
   </view>
 

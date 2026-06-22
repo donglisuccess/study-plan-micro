@@ -1,4 +1,5 @@
 const { trackEvent } = require('../../utils/eventTracker');
+const { getActivePlan } = require('../../utils/planStorage');
 
 function encodeQuery(data) {
   return Object.keys(data).map((key) => {
@@ -23,7 +24,7 @@ Page({
   },
 
   onLoad() {
-    const plan = wx.getStorageSync('latestStudyPlan');
+    const plan = getActivePlan();
 
     if (!plan || !plan.id) {
       wx.showToast({

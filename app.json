@@ -3,6 +3,7 @@
     "pages/loading/loading",
     "pages/index/index",
     "pages/generating/generating",
+    "pages/plans/plans",
     "pages/plan/plan",
     "pages/poster/poster"
   ],

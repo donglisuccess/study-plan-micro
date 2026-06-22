@@ -1,5 +1,10 @@
 const { trackEvent } = require('../../utils/eventTracker');
 const { getBasicOptions } = require('../../utils/api');
+const {
+  getLatestPlan,
+  getPlanHistory,
+  getPlanProgress
+} = require('../../utils/planStorage');
 
 const defaultForm = {
   grade: '',
@@ -45,7 +50,9 @@ Page({
     form: defaultForm,
     isComplete: false,
     isLoadingOptions: true,
-    optionsLoadFailed: false
+    optionsLoadFailed: false,
+    savedPlan: null,
+    planCount: 0
   },
 
   onLoad(options) {
@@ -72,6 +79,59 @@ Page({
 
     trackEvent('visit_home', {
       fromShare: Boolean(options.grade || options.subject || options.goal)
+    });
+  },
+
+  onShow() {
+    this.loadSavedPlan();
+  },
+
+  loadSavedPlan() {
+    const plan = getLatestPlan();
+    const history = getPlanHistory();
+
+    if (!plan || !plan.id || !Array.isArray(plan.items) || !plan.items.length) {
+      this.setData({
+        savedPlan: null,
+        planCount: history.length
+      });
+      return;
+    }
+
+    const progress = getPlanProgress(plan);
+
+    this.setData({
+      planCount: history.length,
+      savedPlan: {
+        id: plan.id,
+        grade: plan.grade,
+        subject: plan.subject,
+        goal: plan.goal,
+        days: plan.days,
+        dailyTime: plan.dailyTime,
+        completedCount: progress.completedCount,
+        progressPercent: progress.progressPercent,
+        allCompleted: progress.allCompleted,
+        nextTaskText: progress.nextTask
+          ? '接下来：第 ' + progress.nextTask.day + ' 天 · ' + progress.nextTask.title
+          : '全部任务已完成，可以查看并复盘整份计划'
+      }
+    });
+  },
+
+  handleViewAllPlans() {
+    wx.navigateTo({
+      url: '/pages/plans/plans'
+    });
+  },
+
+  handleContinuePlan() {
+    if (!this.data.savedPlan) {
+      return;
+    }
+
+    wx.navigateTo({
+      url: '/pages/plan/plan?id=' + encodeURIComponent(this.data.savedPlan.id)
     });
   },
 

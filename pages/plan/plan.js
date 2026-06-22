@@ -1,8 +1,12 @@
 const { trackEvent } = require('../../utils/eventTracker');
-
-function completionKey(planId) {
-  return 'planCompleted_' + planId;
-}
+const {
+  getLatestPlan,
+  getPlanById,
+  setActivePlan,
+  getCompletedMap,
+  saveCompletedMap,
+  removePlan
+} = require('../../utils/planStorage');
 
 function encodeQuery(data) {
   return Object.keys(data).map((key) => {
@@ -25,6 +29,14 @@ Page({
   data: {
     plan: null,
     completedCount: 0,
+    progressPercent: 0,
+    nextTaskText: '',
+    allCompleted: false,
+    weeks: [],
+    selectedWeekIndex: 0,
+    weekScrollLeft: 0,
+    visibleItems: [],
+    expandedDay: 0,
     showFeedback: false,
     feedbackOptions: [
       { label: '有帮助', active: false },
@@ -37,12 +49,13 @@ Page({
     feedbackText: ''
   },
 
-  onLoad() {
-    this.loadPlan();
+  onLoad(options) {
+    this.planId = options.id ? decodeURIComponent(options.id) : '';
+    this.loadPlan(this.planId);
   },
 
-  loadPlan() {
-    const plan = wx.getStorageSync('latestStudyPlan');
+  loadPlan(planId) {
+    const plan = getPlanById(planId) || getLatestPlan();
 
     if (!plan || !plan.id) {
       wx.showToast({
@@ -57,7 +70,8 @@ Page({
       return;
     }
 
-    const completedMap = wx.getStorageSync(completionKey(plan.id)) || {};
+    setActivePlan(plan);
+    const completedMap = getCompletedMap(plan.id);
     const nextItems = (plan.items || []).map((item) => {
       return Object.assign({}, item, {
         completed: Boolean(completedMap[item.day])
@@ -67,10 +81,14 @@ Page({
       items: nextItems
     });
 
-    this.setData({
-      plan: nextPlan,
-      completedCount: this.countCompleted(nextItems)
-    });
+    const firstIncompleteIndex = nextItems.findIndex((item) => !item.completed);
+    const initialItemIndex = firstIncompleteIndex > -1
+      ? firstIncompleteIndex
+      : Math.max(0, nextItems.length - 1);
+    const selectedWeekIndex = Math.floor(initialItemIndex / 7);
+    const expandedDay = nextItems[initialItemIndex] ? nextItems[initialItemIndex].day : 0;
+
+    this.updatePlanView(nextPlan, selectedWeekIndex, expandedDay);
 
     trackEvent('view_plan', {
       planId: nextPlan.id,
@@ -84,6 +102,93 @@ Page({
     return items.filter((item) => item.completed).length;
   },
 
+  buildWeeks(items) {
+    const weeks = [];
+
+    for (let start = 0; start < items.length; start += 7) {
+      const weekItems = items.slice(start, start + 7);
+      const completedCount = this.countCompleted(weekItems);
+      const firstDay = weekItems[0].day;
+      const lastDay = weekItems[weekItems.length - 1].day;
+
+      weeks.push({
+        index: weeks.length,
+        label: '第 ' + (weeks.length + 1) + ' 周',
+        range: firstDay === lastDay
+          ? '第 ' + firstDay + ' 天'
+          : firstDay + '-' + lastDay + ' 天',
+        completedCount,
+        total: weekItems.length,
+        completed: completedCount === weekItems.length
+      });
+    }
+
+    return weeks;
+  },
+
+  getWeekScrollLeft(selectedWeekIndex) {
+    const windowInfo = wx.getWindowInfo
+      ? wx.getWindowInfo()
+      : wx.getSystemInfoSync();
+    const windowWidth = windowInfo.windowWidth || 375;
+    const rpxScale = windowWidth / 750;
+    const tabWidth = 186;
+    const tabGap = 16;
+    const pageHorizontalPadding = 60;
+    const viewportWidth = windowWidth - pageHorizontalPadding * rpxScale;
+    const tabCenter = (selectedWeekIndex * (tabWidth + tabGap) + tabWidth / 2) * rpxScale;
+
+    return Math.max(0, Math.round(tabCenter - viewportWidth / 2));
+  },
+
+  updatePlanView(plan, selectedWeekIndex, expandedDay, options) {
+    const viewOptions = options || {};
+    const updateOverview = viewOptions.updateOverview !== false;
+    const items = plan.items || [];
+    const weekCount = Math.ceil(items.length / 7);
+    const safeWeekIndex = Math.min(
+      Math.max(Number(selectedWeekIndex) || 0, 0),
+      Math.max(weekCount - 1, 0)
+    );
+    const start = safeWeekIndex * 7;
+    const visibleItems = items.slice(start, start + 7).map((item, index) => {
+      return Object.assign({}, item, {
+        originalIndex: start + index,
+        taskCount: (item.tasks || []).length
+      });
+    });
+    const nextExpandedDay = visibleItems.some((item) => item.day === expandedDay)
+      ? expandedDay
+      : visibleItems.length
+        ? visibleItems[0].day
+        : 0;
+
+    const nextData = {
+      selectedWeekIndex: safeWeekIndex,
+      weekScrollLeft: this.getWeekScrollLeft(safeWeekIndex),
+      visibleItems,
+      expandedDay: nextExpandedDay
+    };
+
+    if (updateOverview) {
+      const completedCount = this.countCompleted(items);
+      const nextTask = items.find((item) => !item.completed);
+
+      Object.assign(nextData, {
+        plan,
+        completedCount,
+        progressPercent: plan.days ? Math.round(completedCount / plan.days * 100) : 0,
+        nextTaskText: nextTask
+          ? '下一项：第 ' + nextTask.day + ' 天 · ' + nextTask.title
+          : '全部任务已完成，可以进行一次整体复盘',
+        allCompleted: completedCount === plan.days,
+        weeks: this.buildWeeks(items)
+      });
+    }
+
+    this.setData(nextData);
+  },
+
   saveCompleted(plan) {
     const completedMap = {};
     plan.items.forEach((item) => {
@@ -91,7 +196,7 @@ Page({
         completedMap[item.day] = true;
       }
     });
-    wx.setStorageSync(completionKey(plan.id), completedMap);
+    saveCompletedMap(plan.id, completedMap);
   },
 
   toggleComplete(event) {
@@ -104,9 +209,41 @@ Page({
     plan.items = items;
 
     this.saveCompleted(plan);
+    let expandedDay = items[index].day;
+
+    if (items[index].completed && this.data.expandedDay === items[index].day) {
+      const start = this.data.selectedWeekIndex * 7;
+      const nextIncomplete = items
+        .slice(start, start + 7)
+        .find((item) => !item.completed && item.day > items[index].day);
+      if (nextIncomplete) {
+        expandedDay = nextIncomplete.day;
+      }
+    }
+
+    this.updatePlanView(plan, this.data.selectedWeekIndex, expandedDay);
+  },
+
+  selectWeek(event) {
+    const selectedWeekIndex = Number(event.currentTarget.dataset.index);
+    const start = selectedWeekIndex * 7;
+    const weekItems = this.data.plan.items.slice(start, start + 7);
+    const firstIncomplete = weekItems.find((item) => !item.completed);
+    const expandedDay = firstIncomplete
+      ? firstIncomplete.day
+      : weekItems.length
+        ? weekItems[0].day
+        : 0;
+
+    this.updatePlanView(this.data.plan, selectedWeekIndex, expandedDay, {
+      updateOverview: false
+    });
+  },
+
+  toggleDayExpand(event) {
+    const day = Number(event.currentTarget.dataset.day);
     this.setData({
-      plan,
-      completedCount: this.countCompleted(items)
+      expandedDay: this.data.expandedDay === day ? 0 : day
     });
   },
 
@@ -126,8 +263,27 @@ Page({
   },
 
   handleRegenerate() {
-    wx.reLaunch({
-      url: '/pages/index/index'
+    const plan = this.data.plan;
+    if (!plan) {
+      return;
+    }
+
+    wx.showModal({
+      title: '重新生成计划',
+      content: '当前计划将从“我的学习计划”中移除，已完成记录也会清空。',
+      confirmText: '重新生成',
+      confirmColor: '#2f80ed',
+      success: (result) => {
+        if (!result.confirm) {
+          return;
+        }
+
+        const query = formatPlanQuery(plan);
+        removePlan(plan.id);
+        wx.reLaunch({
+          url: '/pages/index/index?' + query
+        });
+      }
     });
   },
 

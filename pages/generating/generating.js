@@ -1,5 +1,6 @@
 const { generateStudyPlan } = require('../../utils/api');
 const { trackEvent } = require('../../utils/eventTracker');
+const { savePlan } = require('../../utils/planStorage');
 
 const MIN_GENERATING_TIME = 1800;
 
@@ -122,7 +123,7 @@ Page({
       return;
     }
 
-    wx.setStorageSync('latestStudyPlan', plan);
+    savePlan(plan);
     trackEvent('generate_success', {
       planId: plan.id,
       grade: plan.grade,

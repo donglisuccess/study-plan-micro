@@ -1,0 +1,77 @@
+<view class="plans-page">
+  <view class="plans-header">
+    <view class="plans-title">我的学习计划</view>
+    <view class="plans-subtitle">不同学科独立记录，完成进度自动保存</view>
+    <view class="plans-stats" wx:if="{{plans.length}}">
+      <view class="stat-item">
+        <view class="stat-value">{{plans.length}}</view>
+        <view class="stat-label">计划总数</view>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <view class="stat-value">{{subjectCount}}</view>
+        <view class="stat-label">覆盖学科</view>
+      </view>
+    </view>
+  </view>
+
+  <scroll-view
+    class="subject-filters"
+    scroll-x="{{true}}"
+    show-scrollbar="{{false}}"
+    wx:if="{{plans.length}}"
+  >
+    <view class="subject-filters-inner">
+      <view
+        wx:for="{{subjectFilters}}"
+        wx:key="*this"
+        class="subject-filter {{selectedSubject == item ? 'is-active' : ''}}"
+        data-subject="{{item}}"
+        bindtap="selectSubject"
+      >{{item}}</view>
+    </view>
+  </scroll-view>
+
+  <view class="plans-list" wx:if="{{visiblePlans.length}}">
+    <view
+      class="plan-history-card {{item.allCompleted ? 'is-completed' : ''}}"
+      wx:for="{{visiblePlans}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="openPlan"
+    >
+      <view class="history-card-top">
+        <view class="subject-mark">{{item.subjectMark}}</view>
+        <view class="history-main">
+          <view class="history-title">{{item.grade}} · {{item.subject}}</view>
+          <view class="history-meta">{{item.goal}} · {{item.days}} 天 · 每天 {{item.dailyTime}}</view>
+        </view>
+        <view class="history-arrow">›</view>
+      </view>
+
+      <view class="history-progress-heading">
+        <view>{{item.allCompleted ? '计划已完成' : '学习进度'}}</view>
+        <view class="history-progress-value">{{item.completedCount}}/{{item.days}} · {{item.progressPercent}}%</view>
+      </view>
+      <view class="history-progress-track">
+        <view class="history-progress-fill" style="width: {{item.progressPercent}}%;"></view>
+      </view>
+
+      <view class="history-next">{{item.nextTaskText}}</view>
+      <view class="history-footer">
+        <view class="history-time">{{item.savedTimeText}}</view>
+        <view class="history-action">{{item.allCompleted ? '查看复盘' : '继续学习'}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-plans" wx:else>
+    <view class="empty-icon">
+      <view class="empty-line"></view>
+      <view class="empty-line is-short"></view>
+    </view>
+    <view class="empty-title">还没有学习计划</view>
+    <view class="empty-desc">先为孩子生成一份计划，之后可以在这里按学科查看。</view>
+    <button class="create-plan-button" bindtap="goCreatePlan">去生成计划</button>
+  </view>
+</view>

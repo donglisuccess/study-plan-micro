@@ -16,8 +16,36 @@
     </swiper-item>
   </swiper>
 
+  <view class="saved-plan-card" wx:if="{{savedPlan}}">
+    <view class="saved-plan-card-header">
+      <view class="saved-plan-eyebrow">上次学习计划</view>
+      <button class="all-plans-button" bindtap="handleViewAllPlans">
+        <view class="all-plans-icon"></view>
+        <text>全部计划</text>
+        <text class="all-plans-count">{{planCount}}</text>
+        <text class="all-plans-arrow">›</text>
+      </button>
+    </view>
+    <view class="saved-plan-top">
+      <view class="saved-plan-info">
+        <view class="saved-plan-title">{{savedPlan.grade}} · {{savedPlan.subject}}</view>
+        <view class="saved-plan-meta">{{savedPlan.goal}} · {{savedPlan.days}} 天 · 每天 {{savedPlan.dailyTime}}</view>
+      </view>
+      <view class="saved-plan-percent">{{savedPlan.progressPercent}}%</view>
+    </view>
+    <view class="saved-progress-track">
+      <view class="saved-progress-fill" style="width: {{savedPlan.progressPercent}}%;"></view>
+    </view>
+    <view class="saved-plan-bottom">
+      <view class="saved-plan-next">{{savedPlan.nextTaskText}}</view>
+      <button class="continue-plan-button" bindtap="handleContinuePlan">
+        {{savedPlan.allCompleted ? '查看计划' : '继续学习'}}
+      </button>
+    </view>
+  </view>
+
   <view class="form-card">
-    <view class="section-heading">填写孩子信息</view>
+    <view class="section-heading">{{savedPlan ? '生成一份新计划' : '填写孩子信息'}}</view>
 
     <view class="options-status" wx:if="{{isLoadingOptions}}">
       <view class="loading-dot"></view>
