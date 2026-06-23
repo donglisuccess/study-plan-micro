@@ -32,35 +32,73 @@
     </view>
   </scroll-view>
 
+  <view class="swipe-guide" wx:if="{{visiblePlans.length && showSwipeGuide}}">
+    <view class="swipe-guide-gesture">
+      <view class="gesture-hand"></view>
+      <view class="gesture-arrow"></view>
+    </view>
+    <view class="swipe-guide-copy">
+      <view class="swipe-guide-title">左滑计划卡片可删除</view>
+      <view class="swipe-guide-desc">学习进度会与计划一起清除</view>
+    </view>
+    <view class="swipe-guide-close" catchtap="closeSwipeGuide" aria-label="关闭提示">
+      <view class="close-line close-line-a"></view>
+      <view class="close-line close-line-b"></view>
+    </view>
+  </view>
+
   <view class="plans-list" wx:if="{{visiblePlans.length}}">
     <view
-      class="plan-history-card {{item.allCompleted ? 'is-completed' : ''}}"
+      class="swipe-plan-item {{swipingPlanId == item.id ? 'is-dragging' : ''}}"
       wx:for="{{visiblePlans}}"
       wx:key="id"
-      data-id="{{item.id}}"
-      bindtap="openPlan"
     >
-      <view class="history-card-top">
-        <view class="subject-mark">{{item.subjectMark}}</view>
-        <view class="history-main">
-          <view class="history-title">{{item.grade}} · {{item.subject}}</view>
-          <view class="history-meta">{{item.goal}} · {{item.days}} 天 · 每天 {{item.dailyTime}}</view>
+      <view
+        class="plan-delete-action"
+        data-id="{{item.id}}"
+        catchtap="deletePlan"
+      >
+        <view class="delete-action-icon">
+          <view class="delete-lid"></view>
+          <view class="delete-bin"></view>
         </view>
-        <view class="history-arrow">›</view>
+        <text>删除</text>
       </view>
 
-      <view class="history-progress-heading">
-        <view>{{item.allCompleted ? '计划已完成' : '学习进度'}}</view>
-        <view class="history-progress-value">{{item.completedCount}}/{{item.days}} · {{item.progressPercent}}%</view>
-      </view>
-      <view class="history-progress-track">
-        <view class="history-progress-fill" style="width: {{item.progressPercent}}%;"></view>
-      </view>
+      <view
+        class="swipe-card-content"
+        style="transform: translateX({{item.swipeOffset}}px);"
+        data-id="{{item.id}}"
+        bindtouchstart="handlePlanTouchStart"
+        bindtouchmove="handlePlanTouchMove"
+        bindtouchend="handlePlanTouchEnd"
+        bindtouchcancel="handlePlanTouchEnd"
+        bindtap="openPlan"
+      >
+        <view class="plan-history-card {{item.allCompleted ? 'is-completed' : ''}}">
+          <view class="history-card-top">
+            <view class="subject-mark">{{item.subjectMark}}</view>
+            <view class="history-main">
+              <view class="history-title">{{item.grade}} · {{item.subject}}</view>
+              <view class="history-meta">{{item.goal}} · {{item.days}} 天 · 每天 {{item.dailyTime}}</view>
+            </view>
+            <view class="history-arrow">›</view>
+          </view>
 
-      <view class="history-next">{{item.nextTaskText}}</view>
-      <view class="history-footer">
-        <view class="history-time">{{item.savedTimeText}}</view>
-        <view class="history-action">{{item.allCompleted ? '查看复盘' : '继续学习'}}</view>
+          <view class="history-progress-heading">
+            <view>{{item.allCompleted ? '计划已完成' : '学习进度'}}</view>
+            <view class="history-progress-value">{{item.completedCount}}/{{item.days}} · {{item.progressPercent}}%</view>
+          </view>
+          <view class="history-progress-track">
+            <view class="history-progress-fill" style="width: {{item.progressPercent}}%;"></view>
+          </view>
+
+          <view class="history-next">{{item.nextTaskText}}</view>
+          <view class="history-footer">
+            <view class="history-time">{{item.savedTimeText}}</view>
+            <view class="history-action">{{item.allCompleted ? '查看复盘' : '继续学习'}}</view>
+          </view>
+        </view>
       </view>
     </view>
   </view>

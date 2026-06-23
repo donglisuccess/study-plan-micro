@@ -108,20 +108,41 @@
     <view class="hint-line"></view>
   </view>
 
-  <view class="fixed-actions poster-actions">
-    <button class="share-main-button" open-type="share" bindtap="handleShareTap">
-      <view class="share-icon">
-        <view class="share-dot share-dot-a"></view>
-        <view class="share-dot share-dot-b"></view>
-        <view class="share-dot share-dot-c"></view>
-        <view class="share-link share-link-a"></view>
-        <view class="share-link share-link-b"></view>
-      </view>
-      <text>分享给家人朋友</text>
-    </button>
-    <view class="poster-action-row">
-      <button class="minor-action-button" bindtap="handleSave">保存海报</button>
-      <button class="minor-action-button" bindtap="handleBack">返回计划</button>
+  <view class="poster-action-bar">
+    <view class="poster-action-inner">
+      <button
+        class="utility-action-button"
+        bindtap="handleSave"
+        disabled="{{isSaving}}"
+      >
+        <view class="save-action-icon {{isSaving ? 'is-saving' : ''}}">
+          <view class="save-arrow"></view>
+          <view class="save-tray"></view>
+        </view>
+        <text class="utility-action-label">{{isSaving ? '生成中' : '保存海报'}}</text>
+      </button>
+
+      <button class="utility-action-button" bindtap="handleBack">
+        <view class="back-action-icon"></view>
+        <text class="utility-action-label">返回计划</text>
+      </button>
+
+      <button class="share-main-button" open-type="share" bindtap="handleShareTap">
+        <view class="share-icon">
+          <view class="share-dot share-dot-a"></view>
+          <view class="share-dot share-dot-b"></view>
+          <view class="share-dot share-dot-c"></view>
+          <view class="share-link share-link-a"></view>
+          <view class="share-link share-link-b"></view>
+        </view>
+        <text>分享给家人朋友</text>
+      </button>
     </view>
   </view>
+
+  <canvas
+    canvas-id="posterCanvas"
+    class="poster-canvas"
+    style="width: {{canvasWidth}}px; height: {{canvasHeight}}px;"
+  ></canvas>
 </view>

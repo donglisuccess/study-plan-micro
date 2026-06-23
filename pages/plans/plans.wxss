@@ -86,17 +86,244 @@
   font-weight: 800;
 }
 
+.swipe-guide {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  margin: 14rpx 30rpx 0;
+  padding: 18rpx 22rpx;
+  border: 2rpx solid #d6e7fb;
+  border-radius: 14rpx;
+  background: #edf6ff;
+}
+
+.swipe-guide-gesture {
+  position: relative;
+  flex: 0 0 62rpx;
+  width: 62rpx;
+  height: 48rpx;
+  overflow: hidden;
+}
+
+.gesture-hand {
+  position: absolute;
+  right: 3rpx;
+  top: 6rpx;
+  width: 26rpx;
+  height: 34rpx;
+  border: 4rpx solid #2f80ed;
+  border-radius: 13rpx 13rpx 10rpx 10rpx;
+  animation: swipe-guide-move 1.8s ease-in-out infinite;
+}
+
+.gesture-hand::before {
+  content: "";
+  position: absolute;
+  left: 7rpx;
+  top: -13rpx;
+  width: 8rpx;
+  height: 17rpx;
+  border: 4rpx solid #2f80ed;
+  border-bottom: none;
+  border-radius: 8rpx 8rpx 0 0;
+  background: #edf6ff;
+}
+
+.gesture-arrow {
+  position: absolute;
+  left: 3rpx;
+  top: 21rpx;
+  width: 25rpx;
+  height: 4rpx;
+  border-radius: 4rpx;
+  background: #2f80ed;
+}
+
+.gesture-arrow::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -6rpx;
+  width: 12rpx;
+  height: 12rpx;
+  border-left: 4rpx solid #2f80ed;
+  border-bottom: 4rpx solid #2f80ed;
+  transform: rotate(45deg);
+}
+
+.swipe-guide-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.swipe-guide-close {
+  position: relative;
+  flex: 0 0 48rpx;
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background: rgba(47, 128, 237, 0.08);
+}
+
+.close-line {
+  position: absolute;
+  left: 14rpx;
+  top: 22rpx;
+  width: 20rpx;
+  height: 3rpx;
+  border-radius: 3rpx;
+  background: #7189a3;
+}
+
+.close-line-a {
+  transform: rotate(45deg);
+}
+
+.close-line-b {
+  transform: rotate(-45deg);
+}
+
+.swipe-guide-title {
+  color: #215f9f;
+  font-size: 25rpx;
+  line-height: 1.35;
+  font-weight: 800;
+}
+
+.swipe-guide-desc {
+  margin-top: 3rpx;
+  color: #7189a3;
+  font-size: 21rpx;
+  line-height: 1.35;
+}
+
+@keyframes swipe-guide-move {
+  0%,
+  25% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  65% {
+    opacity: 1;
+    transform: translateX(-22rpx);
+  }
+
+  85%,
+  100% {
+    opacity: 0.3;
+    transform: translateX(-22rpx);
+  }
+}
+
 .plans-list {
-  padding: 16rpx 30rpx 0;
+  padding: 18rpx 30rpx 0;
+}
+
+.swipe-plan-item {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 20rpx;
+  border-radius: 16rpx;
+  background: #ef5350;
+  box-shadow: 0 8rpx 24rpx rgba(36, 64, 102, 0.05);
+}
+
+.swipe-card-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  background: #ffffff;
+  transition: transform 0.24s cubic-bezier(0.2, 0.75, 0.25, 1);
+  will-change: transform;
+}
+
+.swipe-plan-item.is-dragging .swipe-card-content {
+  transition: none;
+}
+
+.plan-delete-action {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  width: 144rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  background: linear-gradient(135deg, #ff6b68 0%, #e84545 100%);
+  color: #ffffff;
+  font-size: 25rpx;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.delete-action-icon {
+  position: relative;
+  width: 34rpx;
+  height: 38rpx;
+}
+
+.delete-lid {
+  position: absolute;
+  left: 3rpx;
+  top: 3rpx;
+  width: 28rpx;
+  height: 4rpx;
+  border-radius: 4rpx;
+  background: #ffffff;
+}
+
+.delete-lid::before {
+  content: "";
+  position: absolute;
+  left: 9rpx;
+  top: -6rpx;
+  width: 10rpx;
+  height: 6rpx;
+  border: 3rpx solid #ffffff;
+  border-bottom: none;
+  border-radius: 5rpx 5rpx 0 0;
+}
+
+.delete-bin {
+  position: absolute;
+  left: 6rpx;
+  top: 11rpx;
+  width: 22rpx;
+  height: 25rpx;
+  border: 3rpx solid #ffffff;
+  border-top: none;
+  border-radius: 0 0 5rpx 5rpx;
+}
+
+.delete-bin::before,
+.delete-bin::after {
+  content: "";
+  position: absolute;
+  top: 4rpx;
+  bottom: 4rpx;
+  width: 3rpx;
+  border-radius: 3rpx;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.delete-bin::before {
+  left: 5rpx;
+}
+
+.delete-bin::after {
+  right: 5rpx;
 }
 
 .plan-history-card {
-  margin-bottom: 20rpx;
   padding: 26rpx 26rpx 22rpx;
   border: 2rpx solid #dfe8f2;
   border-radius: 16rpx;
   background: #ffffff;
-  box-shadow: 0 8rpx 24rpx rgba(36, 64, 102, 0.05);
 }
 
 .plan-history-card.is-completed {
