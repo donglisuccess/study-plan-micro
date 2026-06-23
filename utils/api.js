@@ -43,7 +43,16 @@ function generateStudyPlan(options) {
   });
 }
 
+function submitPlanFeedback(feedback) {
+  return request({
+    path: '/api/study-plans/feedback',
+    method: 'POST',
+    data: feedback
+  });
+}
+
 module.exports = {
   getBasicOptions,
-  generateStudyPlan
+  generateStudyPlan,
+  submitPlanFeedback
 };

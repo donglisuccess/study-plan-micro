@@ -203,7 +203,11 @@
         bindinput="handleFeedbackInput"
         maxlength="200"
       ></textarea>
-      <button class="primary-button submit-feedback" bindtap="submitFeedback">提交反馈</button>
+      <button
+        class="primary-button submit-feedback {{isSubmittingFeedback ? 'is-disabled' : ''}}"
+        bindtap="submitFeedback"
+        disabled="{{isSubmittingFeedback}}"
+      >{{isSubmittingFeedback ? '提交中…' : '提交反馈'}}</button>
     </view>
   </view>
 </view>

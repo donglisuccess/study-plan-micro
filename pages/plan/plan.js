@@ -1,4 +1,5 @@
 const { trackEvent } = require('../../utils/eventTracker');
+const { submitPlanFeedback } = require('../../utils/api');
 const {
   getLatestPlan,
   getPlanById,
@@ -47,7 +48,8 @@ Page({
       { label: '内容太多', active: false },
       { label: '想要更详细', active: false }
     ],
-    feedbackText: ''
+    feedbackText: '',
+    isSubmittingFeedback: false
   },
 
   onLoad(options) {
@@ -346,6 +348,9 @@ Page({
   },
 
   closeFeedback() {
+    if (this.data.isSubmittingFeedback) {
+      return;
+    }
     this.setData({
       showFeedback: false
     });
@@ -376,40 +381,68 @@ Page({
   },
 
   submitFeedback() {
+    if (this.data.isSubmittingFeedback) {
+      return;
+    }
+
     const plan = this.data.plan;
     const selectedFeedbacks = this.data.feedbackOptions
       .filter((item) => item.active)
       .map((item) => item.label);
+    const feedbackText = this.data.feedbackText.trim();
+
+    if (!selectedFeedbacks.length && !feedbackText) {
+      wx.showToast({
+        title: '请选择标签或填写反馈',
+        icon: 'none'
+      });
+      return;
+    }
+
     const feedback = {
       planId: plan ? plan.id : '',
       options: selectedFeedbacks,
-      text: this.data.feedbackText,
+      text: feedbackText,
       createdAt: Date.now()
     };
-    const list = wx.getStorageSync('studyPlanFeedbacks') || [];
-    list.push(feedback);
-    wx.setStorageSync('studyPlanFeedbacks', list.slice(-100));
-
-    trackEvent('submit_feedback', {
-      planId: feedback.planId,
-      options: feedback.options,
-      hasText: Boolean(feedback.text)
-    });
-
     this.setData({
-      showFeedback: false,
-      feedbackOptions: this.data.feedbackOptions.map((item) => {
-        return Object.assign({}, item, {
-          active: false
-        });
-      }),
-      feedbackText: ''
+      isSubmittingFeedback: true
     });
 
-    wx.showToast({
-      title: '感谢反馈，我们会继续优化计划内容',
-      icon: 'none'
-    });
+    submitPlanFeedback(feedback)
+      .then(() => {
+        trackEvent('submit_feedback', {
+          planId: feedback.planId,
+          options: feedback.options,
+          hasText: Boolean(feedback.text)
+        });
+
+        this.setData({
+          showFeedback: false,
+          feedbackOptions: this.data.feedbackOptions.map((item) => {
+            return Object.assign({}, item, {
+              active: false
+            });
+          }),
+          feedbackText: ''
+        });
+
+        wx.showToast({
+          title: '感谢反馈，我们会继续优化计划内容',
+          icon: 'none'
+        });
+      })
+      .catch((error) => {
+        wx.showToast({
+          title: error.message || '提交失败，请稍后重试',
+          icon: 'none'
+        });
+      })
+      .finally(() => {
+        this.setData({
+          isSubmittingFeedback: false
+        });
+      });
   },
 
   onUnload() {
