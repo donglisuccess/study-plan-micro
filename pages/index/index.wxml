@@ -150,7 +150,7 @@
       disabled="{{!isComplete || isLoadingOptions || optionsLoadFailed}}"
       bindtap="handleGenerate"
     >
-      <text>{{isLoadingOptions ? '正在加载选项' : isComplete ? '生成我的暑假学习计划' : '请填写完整信息'}}</text>
+      <text>{{isLoadingOptions ? '正在加载选项' : isComplete ? '生成暑假学习计划' : '请填写完整信息'}}</text>
       <text class="generate-arrow" wx:if="{{isComplete && !isLoadingOptions && !optionsLoadFailed}}">→</text>
     </button>
     <view class="bottom-note">

@@ -96,37 +96,44 @@
         </view>
       </view>
 
-      <view class="day-details" wx:if="{{expandedDay == item.day}}">
-        <view class="task-list">
-          <view
-            class="task-row"
-            wx:for="{{item.tasks}}"
-            wx:for-item="task"
-            wx:for-index="taskIndex"
-            wx:key="*this"
-          >
-            <view class="task-index">{{taskIndex + 1}}</view>
-            <view class="task-text">{{task}}</view>
+      <view
+        class="day-details-wrap {{expandedDay == item.day ? 'is-open' : ''}}"
+        style="height: {{expandedDay == item.day ? item.detailsHeight : 0}}px;"
+      >
+        <view class="day-details" data-day="{{item.day}}">
+          <view class="task-list">
+            <view
+              class="task-row"
+              wx:for="{{item.tasks}}"
+              wx:for-item="task"
+              wx:for-index="taskIndex"
+              wx:key="*this"
+            >
+              <view class="task-index">
+                <text class="task-index-number">{{taskIndex + 1}}</text>
+                <text class="task-index-check">✓</text>
+              </view>
+              <view class="task-text">
+                <text class="task-label">{{task}}</text>
+              </view>
+            </view>
+          </view>
+
+          <view class="day-tip">
+            <view class="tip-label">今日提醒</view>
+            <view class="tip-text">{{item.tip}}</view>
           </view>
         </view>
-
-        <view class="day-tip">
-          <view class="tip-label">今日提醒</view>
-          <view class="tip-text">{{item.tip}}</view>
-        </view>
-
-        <button
-          class="day-complete-button {{item.completed ? 'is-completed' : ''}}"
-          data-index="{{item.originalIndex}}"
-          bindtap="toggleComplete"
-        >{{item.completed ? '取消完成' : '完成今天的计划'}}</button>
       </view>
 
       <view
-        class="expand-handle"
+        class="expand-handle {{expandedDay == item.day ? 'is-open' : ''}}"
         data-day="{{item.day}}"
         bindtap="toggleDayExpand"
-      >{{expandedDay == item.day ? '收起任务' : '查看今日任务'}}</view>
+      >
+        <text>{{expandedDay == item.day ? '收起任务' : '查看今日任务'}}</text>
+        <view class="expand-arrow"></view>
+      </view>
     </view>
   </view>
 
@@ -152,6 +159,28 @@
         </view>
         <text>生成分享海报</text>
       </button>
+    </view>
+  </view>
+
+  <view class="completion-celebration" wx:if="{{showPlanCelebration}}">
+    <view class="confetti confetti-a"></view>
+    <view class="confetti confetti-b"></view>
+    <view class="confetti confetti-c"></view>
+    <view class="confetti confetti-d"></view>
+    <view class="confetti confetti-e"></view>
+    <view class="confetti confetti-f"></view>
+    <view class="confetti confetti-g"></view>
+    <view class="confetti confetti-h"></view>
+    <view class="confetti confetti-i"></view>
+    <view class="confetti confetti-j"></view>
+
+    <view class="completion-card">
+      <view class="completion-icon">
+        <view class="completion-check">✓</view>
+      </view>
+      <view class="completion-kicker">计划全部完成</view>
+      <view class="completion-title">这个暑假的坚持，已经开花啦！</view>
+      <view class="completion-description">每一次认真完成，都在让你离目标更近一步。</view>
     </view>
   </view>
 

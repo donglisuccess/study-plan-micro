@@ -37,6 +37,7 @@ Page({
     weekScrollLeft: 0,
     visibleItems: [],
     expandedDay: 0,
+    showPlanCelebration: false,
     showFeedback: false,
     feedbackOptions: [
       { label: '有帮助', active: false },
@@ -145,6 +146,10 @@ Page({
     const viewOptions = options || {};
     const updateOverview = viewOptions.updateOverview !== false;
     const items = plan.items || [];
+    const currentHeightMap = {};
+    (this.data.visibleItems || []).forEach((item) => {
+      currentHeightMap[item.day] = item.detailsHeight || 0;
+    });
     const weekCount = Math.ceil(items.length / 7);
     const safeWeekIndex = Math.min(
       Math.max(Number(selectedWeekIndex) || 0, 0),
@@ -154,7 +159,8 @@ Page({
     const visibleItems = items.slice(start, start + 7).map((item, index) => {
       return Object.assign({}, item, {
         originalIndex: start + index,
-        taskCount: (item.tasks || []).length
+        taskCount: (item.tasks || []).length,
+        detailsHeight: currentHeightMap[item.day] || 0
       });
     });
     const nextExpandedDay = visibleItems.some((item) => item.day === expandedDay)
@@ -173,20 +179,52 @@ Page({
     if (updateOverview) {
       const completedCount = this.countCompleted(items);
       const nextTask = items.find((item) => !item.completed);
+      const totalDays = Number(plan.days) || items.length;
 
       Object.assign(nextData, {
         plan,
         completedCount,
-        progressPercent: plan.days ? Math.round(completedCount / plan.days * 100) : 0,
+        progressPercent: totalDays ? Math.round(completedCount / totalDays * 100) : 0,
         nextTaskText: nextTask
           ? '下一项：第 ' + nextTask.day + ' 天 · ' + nextTask.title
           : '全部任务已完成，可以进行一次整体复盘',
-        allCompleted: completedCount === plan.days,
+        allCompleted: items.length > 0 && completedCount === items.length,
         weeks: this.buildWeeks(items)
       });
     }
 
-    this.setData(nextData);
+    this.setData(nextData, () => {
+      this.measureDayDetails();
+    });
+  },
+
+  measureDayDetails() {
+    const query = wx.createSelectorQuery().in(this);
+    query.selectAll('.day-details').boundingClientRect((rects) => {
+      if (!rects || !rects.length) {
+        return;
+      }
+
+      const heightMap = {};
+      rects.forEach((rect, index) => {
+        const currentItem = this.data.visibleItems[index];
+        const day = Number(rect.dataset && rect.dataset.day)
+          || (currentItem ? currentItem.day : 0);
+        if (day) {
+          heightMap[day] = Math.ceil(rect.height);
+        }
+      });
+
+      const visibleItems = this.data.visibleItems.map((item) => {
+        return Object.assign({}, item, {
+          detailsHeight: heightMap[item.day] || item.detailsHeight || 0
+        });
+      });
+
+      this.setData({
+        visibleItems
+      });
+    }).exec();
   },
 
   saveCompleted(plan) {
@@ -203,25 +241,39 @@ Page({
     const index = Number(event.currentTarget.dataset.index);
     const plan = Object.assign({}, this.data.plan);
     const items = plan.items.slice();
+    const wasCompleted = items[index].completed;
     items[index] = Object.assign({}, items[index], {
-      completed: !items[index].completed
+      completed: !wasCompleted
     });
     plan.items = items;
 
     this.saveCompleted(plan);
-    let expandedDay = items[index].day;
+    this.updatePlanView(plan, this.data.selectedWeekIndex, items[index].day);
 
-    if (items[index].completed && this.data.expandedDay === items[index].day) {
-      const start = this.data.selectedWeekIndex * 7;
-      const nextIncomplete = items
-        .slice(start, start + 7)
-        .find((item) => !item.completed && item.day > items[index].day);
-      if (nextIncomplete) {
-        expandedDay = nextIncomplete.day;
-      }
+    const shouldCelebrate = !wasCompleted
+      && items.length > 0
+      && items.every((item) => item.completed);
+
+    if (shouldCelebrate) {
+      this.showPlanCompletionCelebration();
+    }
+  },
+
+  showPlanCompletionCelebration() {
+    if (this.completionCelebrationTimer) {
+      clearTimeout(this.completionCelebrationTimer);
     }
 
-    this.updatePlanView(plan, this.data.selectedWeekIndex, expandedDay);
+    this.setData({
+      showPlanCelebration: true
+    });
+
+    this.completionCelebrationTimer = setTimeout(() => {
+      this.setData({
+        showPlanCelebration: false
+      });
+      this.completionCelebrationTimer = null;
+    }, 3200);
   },
 
   selectWeek(event) {
@@ -358,6 +410,13 @@ Page({
       title: '感谢反馈，我们会继续优化计划内容',
       icon: 'none'
     });
+  },
+
+  onUnload() {
+    if (this.completionCelebrationTimer) {
+      clearTimeout(this.completionCelebrationTimer);
+      this.completionCelebrationTimer = null;
+    }
   },
 
   onShareAppMessage() {

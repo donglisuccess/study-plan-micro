@@ -46,7 +46,7 @@ Page({
 
   handleSave() {
     wx.showToast({
-      title: 'MVP 版本暂未开放保存图片',
+      title: '保存海报功能即将开放',
       icon: 'none'
     });
   },
